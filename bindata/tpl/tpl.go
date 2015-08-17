@@ -87,7 +87,7 @@ func homeHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "home.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439665071, 0)}
+	info := bindataFileInfo{name: "home.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439782525, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -107,7 +107,7 @@ func indexHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "index.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439665071, 0)}
+	info := bindataFileInfo{name: "index.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439782525, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -127,7 +127,7 @@ func pageHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "page.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439665071, 0)}
+	info := bindataFileInfo{name: "page.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439782525, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -147,7 +147,7 @@ func postHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "post.html", size: 14, mode: os.FileMode(420), modTime: time.Unix(1439753766, 0)}
+	info := bindataFileInfo{name: "post.html", size: 14, mode: os.FileMode(420), modTime: time.Unix(1439782525, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
