@@ -420,7 +420,6 @@ func NewApp() *App {
 				for k, v := range allSections {
 					werr := writeUp(k, v)
 					if werr != nil {
-						log.Error(werr)
 						return err // if we encounter any error we abort
 					}
 				}
