@@ -437,10 +437,10 @@ func (a *App) Set(val interface{}) {
 	switch val.(type) {
 	case FrontMatter:
 		a.frontmatter = val.(FrontMatter)
-	case FileLoader:
-		a.fileLoader = val.(FileLoader)
-	case Renderer:
-		a.rendr = val.(Renderer)
+	case func(string) ([]string, error):
+		a.fileLoader = val.(func(string) ([]string, error))
+	case func(pages PageList, opts ...interface{}) error:
+		a.rendr = val.(func(pages PageList, opts ...interface{}) error)
 	}
 }
 

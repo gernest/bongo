@@ -1,6 +1,7 @@
 package bongo
 
 import (
+	"errors"
 	"io"
 	"testing"
 )
@@ -16,6 +17,21 @@ func TestApp(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
+	testFileLoader := func(in string) ([]string, error) {
+		return []string{in}, nil
+	}
+	testRenderer := func(pages PageList, opts ...interface{}) error {
+		return errors.New("whacko")
+	}
 	app := NewApp()
 	app.Set(testFront{})
+	app.Set(testFileLoader)
+	app.Set(testRenderer)
+
+	if foo, _ := app.fileLoader("foo"); foo[0] != "foo" {
+		t.Errorf("expected foo got %s", foo)
+	}
+	if err := app.rendr(nil); err.Error() != "whacko" {
+		t.Errorf("expected whcko got %v", err)
+	}
 }
