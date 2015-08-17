@@ -14,6 +14,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/a8m/mark"
+	"github.com/gernest/bongo/bindata/static"
 	"github.com/gernest/bongo/bindata/tpl"
 	"github.com/gernest/front"
 	"gopkg.in/yaml.v2"
@@ -30,6 +31,7 @@ const (
 	defaultPageKey    = "Page"
 	defaultConfifFile = "_bongo.yml"
 	siteConfigKey     = "Site"
+	cssDir            = "css"
 )
 
 var (
@@ -287,6 +289,22 @@ func NewApp() *App {
 
 				//buildDir is the directory, in which the geneated files will be written.
 				buildDir := filepath.Join(basePath, outputDir)
+
+				// if everything goes well we copy the static assets.
+				defer func() {
+					cssOut := filepath.Join(basePath, filepath.Join(outputDir, cssDir))
+					os.MkdirAll(cssOut, baseInfo.Mode())
+					buf := &bytes.Buffer{}
+					for _, f := range static.AssetNames() {
+						b, err := static.Asset(f)
+						if err != nil {
+							continue
+						}
+						buf.Write(b)
+					}
+					ioutil.WriteFile(filepath.Join(cssOut, "style.css"), buf.Bytes(), defaultPerm)
+
+				}()
 
 				// If there is already a built project we remove it and start afresh
 				info, err := os.Stat(buildDir)
