@@ -16,17 +16,20 @@ import (
 	"github.com/a8m/mark"
 	"github.com/gernest/bongo/bindata/tpl"
 	"github.com/gernest/front"
+	"gopkg.in/yaml.v2"
 )
 
 const (
-	modTime        = "timeStamp"
-	defaultView    = "post"
-	pageSection    = "section"
-	outputDir      = "_site"
-	defaultSection = "home"
-	defaultExt     = ".html"
-	defaultPerm    = 0600
-	defaultPageKey = "Page"
+	modTime           = "timeStamp"
+	defaultView       = "post"
+	pageSection       = "section"
+	outputDir         = "_site"
+	defaultSection    = "home"
+	defaultExt        = ".html"
+	defaultPerm       = 0600
+	defaultPageKey    = "Page"
+	defaultConfifFile = "_bongo.yml"
+	siteConfigKey     = "Site"
 )
 
 var (
@@ -120,6 +123,31 @@ func NewApp() *App {
 		},
 		frontmatter: matter,
 		rendr: func(pgs PageList, opts ...interface{}) error {
+			if len(opts) == 0 {
+				return fmt.Errorf("%s", "expected root path to the project")
+			}
+			basePath := opts[0].(string)
+
+			// siteConfig contains values defined in the project cofiguration file.
+			// you can define arbitrary values in the config file. so long they are
+			// valid yaml.
+			//
+			// the default dane for configuration file is _bongo.yml
+			var siteConfig = func() interface{} {
+				configFile := filepath.Join(basePath, defaultConfifFile)
+				b, err := ioutil.ReadFile(configFile)
+				if err != nil {
+					return nil
+				}
+
+				out := make(map[string]interface{})
+				err = yaml.Unmarshal(b, out)
+				if err != nil {
+					return nil
+				}
+				return out
+
+			}()
 
 			// loadTpl loads default templates. bongo default templates are embeded
 			// by the go-bindata tool.
@@ -195,7 +223,11 @@ func NewApp() *App {
 							view = v.(string)
 						}
 					}
-					data[defaultPageKey] = page
+					data[defaultPageKey] = page // add the page to context
+
+					if siteConfig != nil {
+						data[siteConfigKey] = siteConfig // set sitewide configurations
+					}
 
 					err := render(page, fmt.Sprintf("%s.html", view), data) // render the page
 					if err != nil {
@@ -242,10 +274,6 @@ func NewApp() *App {
 			// now we build the site. If there is any kind of error ecountered. the built
 			// pages are removed and the process is aborted.
 			return func() error {
-				if len(opts) == 0 {
-					return fmt.Errorf("%s", "expected root path to the project")
-				}
-				basePath := opts[0].(string)
 
 				// all directories whuch wull be written in the generated output
 				// will inherit permission of the root directory(the directory in which the
@@ -402,9 +430,16 @@ func (a *App) Set(val interface{}) {
 // Run runs the app, and result in static content generation. This method is safe to run
 // concurretly.
 func (a *App) Run(root string) {
+
+	//
+	//
+	// FILE LOADING STAGE
+	//
+	//
 	files, err := a.fileLoader(root)
 	if len(files) == 0 && err != nil {
 		log.Fatalf("bongo: no files for processing %v", err)
+		return
 	}
 
 	// we extract the components of the files produced by fileloader and store them ins
@@ -448,6 +483,12 @@ END:
 		}
 
 	}
+
+	//
+	//
+	//	RENDERING STAGE
+	//
+	//
 	err = a.rendr(pages, root) // render the project
 	if err != nil {
 		log.Errorf("bongo: some fish rendering the project %v", err)
