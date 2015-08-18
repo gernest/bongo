@@ -70,7 +70,7 @@ type (
 	}
 
 	//Renderer renders the the projest.
-	Renderer func(pages PageList, opts ...interface{}) error
+	Renderer func(pages PageList, basePath string, opts ...interface{}) error
 )
 
 func (p *Page) HTML() template.HTML {
@@ -129,12 +129,7 @@ func NewApp() *App {
 			return rst, err
 		},
 		frontmatter: matter,
-		rendr: func(pgs PageList, opts ...interface{}) error {
-			if len(opts) == 0 {
-				return fmt.Errorf("%s", "expected root path to the project")
-			}
-			basePath := opts[0].(string)
-
+		rendr: func(pgs PageList, basePath string, opts ...interface{}) error {
 			var (
 
 				// siteConfig contains values defined in the project cofiguration file.
@@ -317,14 +312,12 @@ func NewApp() *App {
 				}
 
 				// render the index page
-				out := &bytes.Buffer{}
-				err = baseTpl.ExecuteTemplate(out, defaultTpl.index, data)
+				out, err := render(defaultTpl.index, data)
 				if err != nil {
 					return fmt.Errorf("executing template %v", err)
 				}
-
 				// write the index page
-				ioerr := ioutil.WriteFile(destIndex, out.Bytes(), defaultPerm)
+				ioerr := ioutil.WriteFile(destIndex, []byte(out), defaultPerm)
 				if ioerr != nil {
 					return ioerr
 				}
@@ -370,6 +363,7 @@ func NewApp() *App {
 						renderedPage, err := render(fmt.Sprintf("%s.html", view), data) // render the page
 						if err != nil {
 							tr <- fmt.Errorf("bongo: rendering %s %v", page.Path, err)
+							return
 						}
 						dPath := strings.Replace(filepath.Base(page.Path), filepath.Ext(page.Path), defaultExt, -1)
 						destDir := filepath.Join(buildDir, key)
@@ -379,12 +373,14 @@ func NewApp() *App {
 						ioerr := ioutil.WriteFile(destFile, []byte(renderedPage), defaultPerm)
 						if ioerr != nil {
 							tr <- fmt.Errorf("writing to %s %v", destFile, ioerr)
+							return
 						}
 
 					}
 					werr := writeIndex(key, pages, data)
 					if werr != nil {
 						tr <- werr
+						return
 					}
 					good <- true
 				}(trouble, done, k)
@@ -397,7 +393,6 @@ func NewApp() *App {
 			for {
 				select {
 				case err := <-trouble:
-					log.Error(err)
 					errs = err
 					break END
 				case <-done:
@@ -426,8 +421,8 @@ func (a *App) Set(val interface{}) {
 		a.frontmatter = val.(FrontMatter)
 	case func(string) ([]string, error):
 		a.fileLoader = val.(func(string) ([]string, error))
-	case func(pages PageList, opts ...interface{}) error:
-		a.rendr = val.(func(pages PageList, opts ...interface{}) error)
+	case func(pages PageList, basePath string, opts ...interface{}) error:
+		a.rendr = val.(func(pages PageList, basePath string, opts ...interface{}) error)
 	}
 }
 

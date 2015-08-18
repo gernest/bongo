@@ -20,7 +20,7 @@ func TestSet(t *testing.T) {
 	testFileLoader := func(in string) ([]string, error) {
 		return []string{in}, nil
 	}
-	testRenderer := func(pages PageList, opts ...interface{}) error {
+	testRenderer := func(pages PageList, basePath string, opts ...interface{}) error {
 		return errors.New("whacko")
 	}
 	app := NewApp()
@@ -31,7 +31,7 @@ func TestSet(t *testing.T) {
 	if foo, _ := app.fileLoader("foo"); foo[0] != "foo" {
 		t.Errorf("expected foo got %s", foo)
 	}
-	if err := app.rendr(nil); err.Error() != "whacko" {
+	if err := app.rendr(nil, "here"); err.Error() != "whacko" {
 		t.Errorf("expected whcko got %v", err)
 	}
 }
