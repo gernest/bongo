@@ -32,6 +32,8 @@ const (
 	defaultConfifFile = "_bongo.yml"
 	siteConfigKey     = "Site"
 	cssDir            = "css"
+	currentSectionKey = "CurrentSection"
+	allSectionsKey    = "Sections"
 )
 
 var (
@@ -55,7 +57,6 @@ type (
 		Path    string
 		Body    string
 		ModTime time.Time
-		HTML    template.HTML
 		Data    interface{}
 	}
 
@@ -71,6 +72,10 @@ type (
 	//Renderer renders the the projest.
 	Renderer func(pages PageList, opts ...interface{}) error
 )
+
+func (p *Page) HTML() template.HTML {
+	return template.HTML(mark.New(p.Body, mark.DefaultOptions()).Render())
+}
 
 // App is the main bongo appliaction.
 type App struct {
@@ -130,206 +135,63 @@ func NewApp() *App {
 			}
 			basePath := opts[0].(string)
 
-			// siteConfig contains values defined in the project cofiguration file.
-			// you can define arbitrary values in the config file. so long they are
-			// valid yaml.
-			//
-			// the default dane for configuration file is _bongo.yml
-			var siteConfig = func() interface{} {
-				configFile := filepath.Join(basePath, defaultConfifFile)
-				b, err := ioutil.ReadFile(configFile)
-				if err != nil {
-					return nil
-				}
+			var (
 
-				out := make(map[string]interface{})
-				err = yaml.Unmarshal(b, out)
-				if err != nil {
-					return nil
-				}
-				return out
-
-			}()
-
-			// loadTpl loads default templates. bongo default templates are embeded
-			// by the go-bindata tool.
-			//
-			// So, this function  loads templates from embeded assets found in the
-			// github.com/gernest/bongo/bindata/tpl package.
-			//
-			// If you want to see the command used to generate the tpl package please
-			// see the bindata rule found in the Makefile at the root of this project.
-			var loadTpl = func() (*template.Template, error) {
-				t := template.New("bongo")
-				tNames := []string{
-					defaultTpl.home,
-					defaultTpl.index,
-					defaultTpl.page,
-					defaultTpl.post,
-				}
-				for _, n := range tNames {
-					tx := t.New(n)
-					d, err := tpl.Asset(n)
-					if err != nil {
-						return nil, err
-					}
-					_, err = tx.Parse(string(d))
-					if err != nil {
-						return nil, err
-					}
-				}
-				return t, nil
-			}
-
-			baseTpl, err := loadTpl() // load the templates.
-			if err != nil {
-				return fmt.Errorf("loading templates %v", err)
-			}
-
-			// render renders the page p using the template tmpl, and passing data as
-			// template data context.
-			//
-			// The template used is the one loaded in the baseTpl variable.
-			var render = func(p *Page, tmpl string, data interface{}) error {
-				out := &bytes.Buffer{}
-				rerr := baseTpl.ExecuteTemplate(out, tmpl, data)
-				if rerr != nil {
-					return rerr
-				}
-				p.HTML = template.HTML(out.String())
-				return nil
-			}
-
-			trouble := make(chan error, 10) // For errors reporting
-			done := make(chan bool, 10)     // If the process succeeded
-			for k := range pgs {
-				go func(tr chan error, good chan bool, id int) {
-					page := pgs[id]
-					var (
-						view = defaultView
-						data = make(map[string]interface{})
-					)
-
-					// we use the mark package to render markdown. The default configuration
-					// for mark is prefered.
-					//
-					// I think there is no reason to keep the original markdown text. We only
-					// keep the rendered text for further processing.
-					//
-					// TODO: (gernest) find a better solution?
-					page.HTML = template.HTML(mark.New(page.Body, mark.DefaultOptions()).Render())
-					switch page.Data.(type) {
-					case map[string]interface{}:
-						data = page.Data.(map[string]interface{})
-						if v, ok := data["view"]; ok {
-							view = v.(string)
-						}
-					}
-					data[defaultPageKey] = page // add the page to context
-
-					if siteConfig != nil {
-						data[siteConfigKey] = siteConfig // set sitewide configurations
-					}
-
-					err := render(page, fmt.Sprintf("%s.html", view), data) // render the page
-					if err != nil {
-						tr <- fmt.Errorf("bongo: rendering %s %v", page.Path, err)
-					}
-					good <- true
-				}(trouble, done, k)
-			}
-
-			// errs is a collection of errors accumulated in the rendering process above.
-			var errs []error
-			n := 0
-		END:
-			for {
-				select {
-				case err := <-trouble:
-					errs = append(errs, err)
-					n++
-				case <-done:
-					n++
-				default:
-					if len(pgs) <= n {
-						break END
-					}
-				}
-			}
-
-			if errs != nil {
-
-				// We have to process the errs before returning it. To avoid implementing the
-				// error interface.
-				return func(args []error) error {
-					rst := ""
-					for k, v := range args {
-						if k == 0 {
-							rst = rst + v.Error()
-						}
-						rst = rst + ", \n" + v.Error()
-					}
-					return fmt.Errorf("%s", rst)
-				}(errs)
-			}
-
-			// now we build the site. If there is any kind of error ecountered. the built
-			// pages are removed and the process is aborted.
-			return func() error {
-
-				// all directories whuch wull be written in the generated output
-				// will inherit permission of the root directory(the directory in which the
-				// source files resides.
+				// siteConfig contains values defined in the project cofiguration file.
+				// you can define arbitrary values in the config file. so long they are
+				// valid yaml.
 				//
-				// so baseInfo, is useful only for its Mode method.
-				baseInfo, err := os.Stat(basePath)
-				if err != nil {
-					return fmt.Errorf("getting base infor for %s %v", basePath, err)
-				}
-
-				//buildDir is the directory, in which the geneated files will be written.
-				buildDir := filepath.Join(basePath, outputDir)
-
-				// if everything goes well we copy the static assets.
-				defer func() {
-					cssOut := filepath.Join(basePath, filepath.Join(outputDir, cssDir))
-					os.MkdirAll(cssOut, baseInfo.Mode())
-					buf := &bytes.Buffer{}
-					for _, f := range static.AssetNames() {
-						b, err := static.Asset(f)
-						if err != nil {
-							continue
-						}
-						buf.Write(b)
+				// the default dane for configuration file is _bongo.yml
+				siteConfig = func() interface{} {
+					configFile := filepath.Join(basePath, defaultConfifFile)
+					b, err := ioutil.ReadFile(configFile)
+					if err != nil {
+						return nil
 					}
-					ioutil.WriteFile(filepath.Join(cssOut, "style.css"), buf.Bytes(), defaultPerm)
+
+					out := make(map[string]interface{})
+					err = yaml.Unmarshal(b, out)
+					if err != nil {
+						return nil
+					}
+					return out
 
 				}()
 
-				// If there is already a built project we remove it and start afresh
-				info, err := os.Stat(buildDir)
-				if err != nil {
-					if os.IsNotExist(err) {
-						oerr := os.MkdirAll(buildDir, baseInfo.Mode())
-						if oerr != nil {
-							return fmt.Errorf("create build dir at %s %v", buildDir, err)
+				// loadTpl loads default templates. bongo default templates are embeded
+				// by the go-bindata tool.
+				//
+				// So, this function  loads templates from embeded assets found in the
+				// github.com/gernest/bongo/bindata/tpl package.
+				//
+				// If you want to see the command used to generate the tpl package please
+				// see the bindata rule found in the Makefile at the root of this project.
+				loadTpl = func() (*template.Template, error) {
+					t := template.New("bongo")
+					tNames := []string{
+						defaultTpl.home,
+						defaultTpl.index,
+						defaultTpl.page,
+						defaultTpl.post,
+					}
+					for _, n := range tNames {
+						tx := t.New(n)
+						d, err := tpl.Asset(n)
+						if err != nil {
+							return nil, err
+						}
+						_, err = tx.Parse(string(d))
+						if err != nil {
+							return nil, err
 						}
 					}
-				} else {
-					oerr := os.RemoveAll(buildDir)
-					if oerr != nil {
-						return fmt.Errorf("cleaning %s %v", buildDir, oerr)
-					}
-					oerr = os.MkdirAll(buildDir, info.Mode())
-					if oerr != nil {
-						return fmt.Errorf("creating %s %v", buildDir, oerr)
-					}
+					return t, nil
 				}
 
 				// getAllSections filter the pagelist for any section informations
 				// it returns a map of all the sections with the pages matching the
 				// section attached as a pagelist.
-				var getAllSections = func(p PageList) map[string]PageList {
+				getAllSections = func(p PageList) map[string]PageList {
 					sections := make(map[string]PageList)
 					for k := range p {
 						page := p[k]
@@ -360,72 +222,197 @@ func NewApp() *App {
 						sections[defaultSection] = dList
 
 					}
+
+					// sort the result before returning
+					for key := range sections {
+						sort.Sort(sections[key])
+					}
 					return sections
 				}
+				allSections = getAllSections(pgs) // get all the sections
 
-				// writeFiles writes a Page to the file in the output directory.
-				// s is the section in which to write the file, and pgs is the pages
-				// residig in the particular section.
-				var writeFiles = func(s string, pgs PageList) error {
-					for _, v := range pgs {
-						dPath := strings.Replace(filepath.Base(v.Path), filepath.Ext(v.Path), defaultExt, -1)
-						destDir := filepath.Join(buildDir, s)
-						destFile := filepath.Join(destDir, dPath)
+				//buildDir is the directory, in which the geneated files will be written.
+				buildDir = filepath.Join(basePath, outputDir)
+			)
 
-						ioerr := ioutil.WriteFile(destFile, []byte(v.HTML), defaultPerm)
-						if ioerr != nil {
-							return fmt.Errorf("writing to %s %v", destFile, ioerr)
+			baseTpl, err := loadTpl() // load the templates.
+			if err != nil {
+				return fmt.Errorf("loading templates %v", err)
+			}
+
+			// render renders the page p using the template tmpl, and passing data as
+			// template data context.
+			//
+			// The template used is the one loaded in the baseTpl variable.
+			var render = func(tmpl string, data interface{}) (string, error) {
+				out := &bytes.Buffer{}
+				rerr := baseTpl.ExecuteTemplate(out, tmpl, data)
+				if rerr != nil {
+					return "", rerr
+				}
+				return out.String(), nil
+			}
+
+			// all directories whuch wull be written in the generated output
+			// will inherit permission of the root directory(the directory in which the
+			// source files resides.
+			//
+			// so baseInfo, is useful only for its Mode method.
+			baseInfo, err := os.Stat(basePath)
+			if err != nil {
+				return fmt.Errorf("getting base infor for %s %v", basePath, err)
+			}
+
+			// Copy assets to the output directory
+			var copyAssets = func() error {
+				cssOut := filepath.Join(basePath, filepath.Join(outputDir, cssDir))
+				os.MkdirAll(cssOut, baseInfo.Mode())
+				buf := &bytes.Buffer{}
+				for _, f := range static.AssetNames() {
+					b, err := static.Asset(f)
+					if err != nil {
+						continue
+					}
+					buf.Write(b)
+				}
+				ioutil.WriteFile(filepath.Join(cssOut, "style.css"), buf.Bytes(), defaultPerm)
+				return nil
+			}
+
+			var prepareBuild = func() error {
+
+				// If there is already a built project we remove it and start afresh
+				info, err := os.Stat(buildDir)
+				if err != nil {
+					if os.IsNotExist(err) {
+						oerr := os.MkdirAll(buildDir, baseInfo.Mode())
+						if oerr != nil {
+							return fmt.Errorf("create build dir at %s %v", buildDir, err)
 						}
 					}
-					return nil
-				}
-
-				//writeUp writes the processed files to the output directory
-				var writeUp = func(pageSec string, pageData PageList) error {
-
-					// sort the datata before rendering
-					sort.Sort(pageData)
-
-					os.MkdirAll(filepath.Join(buildDir, pageSec), baseInfo.Mode()) // create necessary directories
-
-					//destIndex is the path to the index page of the section.
-					destIndex := filepath.Join(buildDir, filepath.Join(pageSec, defaultTpl.index))
-					switch pageSec {
-					case defaultSection:
-						destIndex = filepath.Join(buildDir, defaultTpl.index)
-
+				} else {
+					oerr := os.RemoveAll(buildDir)
+					if oerr != nil {
+						return fmt.Errorf("cleaning %s %v", buildDir, oerr)
 					}
-
-					// render the index page
-					out := &bytes.Buffer{}
-					err = baseTpl.ExecuteTemplate(out, defaultTpl.index, pageData)
-					if err != nil {
-						return fmt.Errorf("executing template %v", err)
-					}
-
-					// write the index page
-					ioerr := ioutil.WriteFile(destIndex, out.Bytes(), defaultPerm)
-					if ioerr != nil {
-						return ioerr
-					}
-
-					ferr := writeFiles(pageSec, pageData) // write all files in the section
-					if ferr != nil {
-						return ferr
-					}
-					return nil
-				}
-
-				allSections := getAllSections(pgs) // get all the sections
-				for k, v := range allSections {
-					werr := writeUp(k, v)
-					if werr != nil {
-						return err // if we encounter any error we abort
+					oerr = os.MkdirAll(buildDir, info.Mode())
+					if oerr != nil {
+						return fmt.Errorf("creating %s %v", buildDir, oerr)
 					}
 				}
 				return nil
+			}
 
-			}()
+			//writeIndex writes the  index  files to the output directories
+			var writeIndex = func(pageSec string, pageData PageList, data interface{}) error {
+
+				os.MkdirAll(filepath.Join(buildDir, pageSec), baseInfo.Mode()) // create necessary directories
+
+				//destIndex is the path to the index page of the section.
+				destIndex := filepath.Join(buildDir, filepath.Join(pageSec, defaultTpl.index))
+				switch pageSec {
+				case defaultSection:
+					destIndex = filepath.Join(buildDir, defaultTpl.index)
+
+				}
+
+				// render the index page
+				out := &bytes.Buffer{}
+				err = baseTpl.ExecuteTemplate(out, defaultTpl.index, data)
+				if err != nil {
+					return fmt.Errorf("executing template %v", err)
+				}
+
+				// write the index page
+				ioerr := ioutil.WriteFile(destIndex, out.Bytes(), defaultPerm)
+				if ioerr != nil {
+					return ioerr
+				}
+				return nil
+			}
+
+			berr := prepareBuild() // prepare build directory
+			if berr != nil {
+				return berr
+			}
+
+			//
+			//
+			//	BUILD
+			//
+			//
+			trouble := make(chan error, 10) // For errors reporting
+			done := make(chan bool, 10)     // If the process succeeded
+			for k := range allSections {
+				go func(tr chan error, good chan bool, key string) {
+					pages := allSections[key]
+					var (
+						view = defaultView
+						data = make(map[string]interface{})
+					)
+
+					data[currentSectionKey] = allSections[key]
+					data[allSectionsKey] = allSections
+
+					if siteConfig != nil {
+						data[siteConfigKey] = siteConfig // set sitewide configurations
+					}
+
+					for _, page := range pages {
+						switch page.Data.(type) {
+						case map[string]interface{}:
+							d := page.Data.(map[string]interface{})
+							if v, ok := d["view"]; ok {
+								view = v.(string)
+							}
+						}
+						data[defaultPageKey] = page
+						renderedPage, err := render(fmt.Sprintf("%s.html", view), data) // render the page
+						if err != nil {
+							tr <- fmt.Errorf("bongo: rendering %s %v", page.Path, err)
+						}
+						dPath := strings.Replace(filepath.Base(page.Path), filepath.Ext(page.Path), defaultExt, -1)
+						destDir := filepath.Join(buildDir, key)
+						os.MkdirAll(destDir, baseInfo.Mode())
+						destFile := filepath.Join(destDir, dPath)
+
+						ioerr := ioutil.WriteFile(destFile, []byte(renderedPage), defaultPerm)
+						if ioerr != nil {
+							tr <- fmt.Errorf("writing to %s %v", destFile, ioerr)
+						}
+
+					}
+					werr := writeIndex(key, pages, data)
+					if werr != nil {
+						tr <- werr
+					}
+					good <- true
+				}(trouble, done, k)
+			}
+
+			// errs is a collection of errors accumulated in the rendering process above.
+			var errs error
+			n := 0
+		END:
+			for {
+				select {
+				case err := <-trouble:
+					log.Error(err)
+					errs = err
+					break END
+				case <-done:
+					n++
+				default:
+					if len(allSections) <= n {
+						break END
+					}
+				}
+			}
+
+			if errs != nil {
+				return errs
+			}
+			return copyAssets()
 
 		},
 		send: make(chan *Page, 100),

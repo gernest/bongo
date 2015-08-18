@@ -107,7 +107,7 @@ func indexHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "index.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439782525, 0)}
+	info := bindataFileInfo{name: "index.html", size: 118, mode: os.FileMode(420), modTime: time.Unix(1439877497, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -132,7 +132,7 @@ func pageHtml() (*asset, error) {
 	return a, nil
 }
 
-var _postHtml = []byte("\x1f\x8b\x08\x00\x00\x09\x6e\x88\x00\xff\xaa\xae\xd6\x0b\x48\x4c\x4f\xd5\x73\xca\x4f\xa9\xac\xad\x05\x04\x00\x00\xff\xff\xfd\xfa\x72\xa3\x0e\x00\x00\x00")
+var _postHtml = []byte("\x1f\x8b\x08\x00\x00\x09\x6e\x88\x00\xff\xaa\xae\xd6\x0b\x48\x4c\x4f\xd5\xf3\x08\xf1\xf5\xa9\xad\x05\x04\x00\x00\xff\xff\xc3\x97\x82\x2b\x0e\x00\x00\x00")
 
 func postHtmlBytes() ([]byte, error) {
 	return bindataRead(
@@ -147,7 +147,7 @@ func postHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "post.html", size: 14, mode: os.FileMode(420), modTime: time.Unix(1439782525, 0)}
+	info := bindataFileInfo{name: "post.html", size: 14, mode: os.FileMode(420), modTime: time.Unix(1439885680, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
