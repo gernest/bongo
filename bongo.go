@@ -9,22 +9,32 @@ import (
 	"github.com/gernest/bongo-contrib/renderers"
 )
 
-type Generator struct {
-	loader models.FileLoader
-	matter models.FrontMatter
-	rendr  models.Renderer
+type DefaultApp struct {
+	loaders.DefaultLoader
+	*matters.Matter
+	renderers.DefaultRenderer
 }
 
-func New() *Generator {
-	return &Generator{
-		loader: loaders.New(),
-		matter: matters.NewYAML(),
-		rendr:  renderers.New(),
-	}
+func newDefaultApp() *DefaultApp {
+	app := &DefaultApp{}
+	app.Matter = matters.NewYAML()
+	return app
 }
 
-func (g *Generator) Run(root string) error {
-	files, err := g.loader.Load(root)
+type App struct {
+	gene models.Generator
+}
+
+func New() *App {
+	return NewApp(newDefaultApp())
+}
+
+func NewApp(g models.Generator) *App {
+	return &App{gene: g}
+}
+
+func (g *App) Run(root string) error {
+	files, err := g.gene.Load(root)
 	if err != nil {
 		return err
 	}
@@ -39,7 +49,7 @@ func (g *Generator) Run(root string) error {
 				return
 			}
 			defer f.Close()
-			front, body, err := g.matter.Parse(f)
+			front, body, err := g.gene.Parse(f)
 			if err != nil {
 				errs <- err
 				return
@@ -74,7 +84,7 @@ END:
 	if fish != nil {
 		return fish
 	}
-	err = g.rendr.Render(root, pages)
+	err = g.gene.Render(root, pages)
 	if err != nil {
 		renderers.Rollback(root) // roll back before exiting
 		return err
