@@ -7,3 +7,9 @@ all:
 
 clean:
 	@cd $(cmd_dir)&&go clean
+
+deps:
+	@go get github.com/mitchellh/gox
+
+dist:
+	gox -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}" ./cmd/bongo 
