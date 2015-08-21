@@ -9,30 +9,34 @@ import (
 	"github.com/gernest/bongo-contrib/renderers"
 )
 
-type DefaultApp struct {
+type defaultApp struct {
 	loaders.DefaultLoader
 	*matters.Matter
 	renderers.DefaultRenderer
 }
 
-func newDefaultApp() *DefaultApp {
-	app := &DefaultApp{}
+func newDefaultApp() *defaultApp {
+	app := &defaultApp{}
 	app.Matter = matters.NewYAML()
 	return app
 }
 
+//App is the main bongo application
 type App struct {
 	gene models.Generator
 }
 
+//New creates a new App which uses default models.Generator implementation
 func New() *App {
 	return NewApp(newDefaultApp())
 }
 
+//NewApp creates a new app, that uses g as the generator
 func NewApp(g models.Generator) *App {
 	return &App{gene: g}
 }
 
+// Run runs the app
 func (g *App) Run(root string) error {
 	files, err := g.gene.Load(root)
 	if err != nil {
