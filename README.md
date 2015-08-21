@@ -6,7 +6,7 @@ An elegant static site generator.
 * fast (yes speed as a feature)
 * flexible. You can assemble your own static generator, actually bongo is just an assemply of interfaces implementation found in the [https://github.com/bongo-contrib](https://github.com/bongo-contrib)
 * simple to use.
-* support themes
+*  themes
 * minimaliistic. This can be very cool if you want to hack on a promising golang project. You can read the whole bongo source(just a single file) in 3 seconds.
 
 # Status
@@ -47,6 +47,11 @@ the directory in which the executable is to system PATH.
 run this command to see all options and usage
 
 	bongo -h
+
+## Help
+
+There is no good documentation for the maoment. You can help by contributing to the bongo documentation
+at [https://github.com/bongo-contrib/docs](https://github.com/bongo-contrib/docs)
 
 # Contributing
 Just fork, and submit a pull request.
