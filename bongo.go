@@ -3,10 +3,10 @@ package bongo
 import (
 	"os"
 
-	"github.com/gernest/bongo-contrib/loaders"
-	"github.com/gernest/bongo-contrib/matters"
-	"github.com/gernest/bongo-contrib/models"
-	"github.com/gernest/bongo-contrib/renderers"
+	"github.com/bongo-contrib/loaders"
+	"github.com/bongo-contrib/matters"
+	"github.com/bongo-contrib/models"
+	"github.com/bongo-contrib/renderers"
 )
 
 type defaultApp struct {
