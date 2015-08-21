@@ -1,5 +1,8 @@
 cmd_dir:=cmd/bongo
-.PHONY: all
+.PHONY: all dist
+ifeq "$(origin APP_VER)" "undefined"
+VERSION=0.1
+endif
 all:
 	@go vet
 	@golint
@@ -12,4 +15,5 @@ deps:
 	@go get github.com/mitchellh/gox
 
 dist:
-	gox -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}" ./cmd/bongo 
+	@rm -r dist
+	@gox -output="dist/{{.Dir}}.v$(VERSION)_{{.OS}}_{{.Arch}}/{{.Dir}}" ./cmd/bongo 
