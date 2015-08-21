@@ -36,6 +36,8 @@ bongo.v0.1_openbsd_amd64|[download](https://github.com/bongo-contrib)
 bongo.v0.1_windows_386|[download](https://github.com/bongo-contrib)
 bongo.v0.1_windows_amd64|[download](https://github.com/bongo-contrib)
 
+After you have download place the executable file somewhere in the system PATH. or add
+the directory in which the executable is to system PATH.
 
 ## using go get
 
