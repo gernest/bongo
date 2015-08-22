@@ -18,6 +18,7 @@ type defaultApp struct {
 func newDefaultApp() *defaultApp {
 	app := &defaultApp{}
 	app.Matter = matters.NewYAML()
+	app.DefaultRenderer=renderers.New()
 	return app
 }
 
@@ -88,9 +89,21 @@ END:
 	if fish != nil {
 		return fish
 	}
+	
+	// run before rendering
+	err=g.gene.Before(root)
+	if err!=nil{
+		return nil
+	}	
 	err = g.gene.Render(root, pages)
 	if err != nil {
 		renderers.Rollback(root) // roll back before exiting
+		return err
+	}
+	
+	// run after rendering
+	err=g.gene.After(root)
+	if err!=nil{
 		return err
 	}
 	return nil
