@@ -16,29 +16,6 @@ The project is in __alpha__ state.
 
 ## download precompiled binaries
 
-### v0.1
-
-os/arch | download link
---------|--------------
-bongo.v0.1_darwin_386|[download](https://github.com/bongo-contrib)
-bongo.v0.1_darwin_amd64|[download](https://github.com/bongo-contrib)
-bongo.v0.1_freebsd_386|[download](https://github.com/bongo-contrib)
-bongo.v0.1_freebsd_amd64|[download](https://github.com/bongo-contrib)
-bongo.v0.1_freebsd_arm|[download](https://github.com/bongo-contrib)
-bongo.v0.1_linux_386|[download](https://github.com/bongo-contrib)
-bongo.v0.1_linux_amd64|[download](https://github.com/bongo-contrib)
-bongo.v0.1_linux_arm|[download](https://github.com/bongo-contrib)
-bongo.v0.1_netbsd_386|[download](https://github.com/bongo-contrib)
-bongo.v0.1_netbsd_amd64|[download](https://github.com/bongo-contrib)
-bongo.v0.1_netbsd_arm|[download](https://github.com/bongo-contrib)
-bongo.v0.1_openbsd_386|[download](https://github.com/bongo-contrib)
-bongo.v0.1_openbsd_amd64|[download](https://github.com/bongo-contrib)
-bongo.v0.1_windows_386|[download](https://github.com/bongo-contrib)
-bongo.v0.1_windows_amd64|[download](https://github.com/bongo-contrib)
-
-After you have download place the executable file somewhere in the system PATH. or add
-the directory in which the executable is to system PATH.
-
 ## using go get
 
 	go get github.com/gernest/bongo/cmd/bongo
