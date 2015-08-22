@@ -12,7 +12,7 @@ import (
 type defaultApp struct {
 	loaders.DefaultLoader
 	*matters.Matter
-	renderers.DefaultRenderer
+	*renderers.DefaultRenderer
 }
 
 func newDefaultApp() *defaultApp {
