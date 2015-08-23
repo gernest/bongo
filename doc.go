@@ -12,6 +12,23 @@ and you can install it via go get like this
 
 	go get github.com/gernest/bongo/cmd/bongo
 
+
+To build your project foo.
+
+*  You can specify the path to foo
+
+	bongo build --source path/to/foo
+
+* You can run at  the root of foo
+
+	cd path/to/foo
+
+	bongo build
+
+
+The generated website will be in the directory _site at the root of your foo project.
+
+
 The Website Project Structure
 
 There is no restriction on how you arrange your project. If you have a project foo.
@@ -72,6 +89,42 @@ theme. They will be copied to the output directory unchanged.
 
 All themes custom themes should live under the _theme directory at the project root. Please
 see https://github.com/gernest/bongo/testdata/sample/_themes for an example.
+
+
+Frontmatter
+
+Bongo support frontmatter. And it is recomended every post(your markdown file) should have
+a frontmatter. For convenience, only YAML frontmatter is supported by default. And you can
+add it at the beginning of your file like this.
+
+	---
+	title: chapter one
+	section: blog
+	---
+
+	Your post contents goes here.
+
+Important frontmatter settings,
+
+	title
+		-The title of the post
+
+	section
+		- this acts as a category of sort. You can specify any section that the
+		post will reside.
+
+		Sections are in the form of relative directory paths. for instance the following
+		are valid sections blog, blog/funny, blog/happy, blog/stuffs.
+
+		If you specify section as blog/golang. bongo will put the generated html files in the
+		folder named blog/golang. And you can referance your post by blog/golang/mypost.html.
+		where mypost is the name of your markdown file.
+
+		The default section is home.
+
+	view
+		- specifies the template to render the content.Defaults to post.
+
 
 
 The Library
