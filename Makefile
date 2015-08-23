@@ -15,7 +15,7 @@ deps:
 	@go get github.com/mitchellh/gox
 
 dist:
-	@rm -r dist
+	-@rm -r dist
 	@gox -output="dist/{{.Dir}}.v$(VERSION)_{{.OS}}_{{.Arch}}/{{.Dir}}" ./cmd/bongo
 
 test:
