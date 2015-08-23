@@ -6,7 +6,7 @@ Bongo comes in two flavors. The commandline applicaion and the library.
 
 Commandline
 
-The commandline application can be found here https://github.com/gernest/bongo/cmd/bongo
+The commandline application can be found in cmd/bongo directory
 
 and you can install it via go get like this
 
@@ -32,8 +32,7 @@ The generated website will be in the directory _site at the root of your foo pro
 The Website Project Structure
 
 There is no restriction on how you arrange your project. If you have a project foo.
-It will be somewhare in a directory named foo. You can see the example at
-https://github.com/gernest/bongo/testdata/sample.
+It will be somewhare in a directory named foo. You can see the example in testdata/sample directory.
 
 
 Bongo only process markdown files found in your project root.Supported file extensions
@@ -88,7 +87,7 @@ IMPORTANT: All static contents should be placed in a diretory named static at th
 theme. They will be copied to the output directory unchanged.
 
 All themes custom themes should live under the _theme directory at the project root. Please
-see https://github.com/gernest/bongo/testdata/sample/_themes for an example.
+see testdata/sample/_themes for an example.
 
 
 Frontmatter
