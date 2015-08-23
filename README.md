@@ -25,11 +25,6 @@ run this command to see all options and usage
 
 	bongo -h
 
-## Help
-
-There is no good documentation for the maoment. You can help by contributing to the bongo documentation
-at [https://github.com/bongo-contrib/docs](https://github.com/bongo-contrib/docs)
-
 # Contributing
 Just fork, and submit a pull request.
 
