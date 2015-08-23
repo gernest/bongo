@@ -3,7 +3,7 @@ cmd_dir:=cmd/bongo
 ifeq "$(origin APP_VER)" "undefined"
 VERSION=0.1
 endif
-all:
+all: test
 	@go vet
 	@golint
 	@cd $(cmd_dir)&&go build
@@ -16,4 +16,7 @@ deps:
 
 dist:
 	@rm -r dist
-	@gox -output="dist/{{.Dir}}.v$(VERSION)_{{.OS}}_{{.Arch}}/{{.Dir}}" ./cmd/bongo 
+	@gox -output="dist/{{.Dir}}.v$(VERSION)_{{.OS}}_{{.Arch}}/{{.Dir}}" ./cmd/bongo
+
+test:
+	@go test 
