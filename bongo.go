@@ -18,7 +18,7 @@ type defaultApp struct {
 func newDefaultApp() *defaultApp {
 	app := &defaultApp{}
 	app.Matter = matters.NewYAML()
-	app.DefaultRenderer=renderers.New()
+	app.DefaultRenderer = renderers.New()
 	return app
 }
 
@@ -43,7 +43,7 @@ func (g *App) Run(root string) error {
 	if err != nil {
 		return err
 	}
-	var pages models.PageList
+	pages := make(models.PageList, len(files))
 	send := make(chan *models.Page)
 	errs := make(chan error)
 	for _, f := range files {
@@ -73,7 +73,7 @@ END:
 	for {
 		select {
 		case pg := <-send:
-			pages = append(pages, pg)
+			pages[n] = pg
 			n++
 		case perr := <-errs:
 			fish = perr
@@ -89,21 +89,21 @@ END:
 	if fish != nil {
 		return fish
 	}
-	
+
 	// run before rendering
-	err=g.gene.Before(root)
-	if err!=nil{
+	err = g.gene.Before(root)
+	if err != nil {
 		return nil
-	}	
+	}
 	err = g.gene.Render(root, pages)
 	if err != nil {
 		renderers.Rollback(root) // roll back before exiting
 		return err
 	}
-	
+
 	// run after rendering
-	err=g.gene.After(root)
-	if err!=nil{
+	err = g.gene.After(root)
+	if err != nil {
 		return err
 	}
 	return nil
