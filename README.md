@@ -4,10 +4,10 @@ An elegant static site generator.
 
 # Features
 * fast (yes speed as a feature)
-* flexible. You can assemble your own static generator, actually bongo is just an assemply of interfaces implementation found in the [https://github.com/bongo-contrib](https://github.com/bongo-contrib)
+* flexible. You can assemble your own static generator.
 * simple to use.
-*  themes
-* minimaliistic. This can be very cool if you want to hack on a promising golang project. You can read the whole bongo source(just a single file) in 3 seconds.
+* themes support.
+* minimaliistic.
 
 # Status
 The project is in __alpha__ state.

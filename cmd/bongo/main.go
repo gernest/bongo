@@ -2,9 +2,16 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
+	"path/filepath"
+
+	"github.com/bongo-contrib/loaders"
+	"github.com/bongo-contrib/models"
 
 	"github.com/gernest/bongo"
+
+	"gopkg.in/fsnotify.v1"
 
 	"github.com/codegangsta/cli"
 )
@@ -39,6 +46,53 @@ func build(ctx *cli.Context) {
 	if err != nil {
 		log.Println(err)
 	}
+
+}
+
+func serve(ctx *cli.Context) {
+	wd, _ := os.Getwd()
+	src := wd
+	if f := ctx.String(sourceFlagName); f != "" {
+		src = f
+	}
+	app := bongo.New()
+	err := app.Run(src)
+	if err != nil {
+		log.Println(err)
+	}
+	files, err := loaders.New().Load(src)
+	if err != nil {
+		log.Fatal(err)
+	}
+	watch, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer watch.Close()
+	for _, file := range files {
+		watch.Add(file)
+	}
+	go func() {
+		dir := filepath.Join(src, models.OutputDir)
+		log.Println("serving website", dir, "  at  http://localhost:8000")
+		log.Fatal(http.ListenAndServe(":8000", http.FileServer(http.Dir(dir))))
+	}()
+	for {
+		select {
+		case event := <-watch.Events:
+			if event.Op&(fsnotify.Rename|fsnotify.Create|fsnotify.Write) > 0 {
+				log.Printf("detected change %s  Rebuilding...\n", event.Name)
+				app.Run(src)
+			}
+		case err := <-watch.Errors:
+			if err != nil {
+				log.Println(err)
+			}
+		default:
+			continue
+		}
+	}
+
 }
 
 func main() {
@@ -54,6 +108,14 @@ func main() {
 			Usage:       "build site",
 			Description: "build site",
 			Action:      build,
+			Flags:       buildFlags(),
+		},
+		cli.Command{
+			Name:        "serve",
+			ShortName:   "s",
+			Usage:       "builds and serves the project",
+			Description: "serves site",
+			Action:      serve,
 			Flags:       buildFlags(),
 		},
 	}

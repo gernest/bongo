@@ -12,6 +12,7 @@ and you can install it via go get like this
 
 	go get github.com/gernest/bongo/cmd/bongo
 
+Or just download the latest binary here https://github.com/bongo/releases/latest
 
 To build your project foo.
 
@@ -24,6 +25,19 @@ To build your project foo.
 	cd path/to/foo
 
 	bongo build
+
+To serve your project locally. This will run a local server at port http://localhost:8000.
+The project will be rebuilt if any markdown file changes.
+
+*  You can specify the path to foo
+
+	bongo serve --source path/to/foo
+
+* You can run at  the root of foo
+
+	cd path/to/foo
+
+	bongo serve
 
 
 The generated website will be in the directory _site at the root of your foo project.

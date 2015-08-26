@@ -20,3 +20,6 @@ dist:
 
 test:
 	@go test 
+
+install:
+	@cd $(cmd_dir)&&go install
