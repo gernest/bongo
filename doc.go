@@ -12,7 +12,7 @@ and you can install it via go get like this
 
 	go get github.com/gernest/bongo/cmd/bongo
 
-Or just download the latest binary here https://github.com/bongo/releases/latest
+Or just download the latest binary here https://github.com/gernest/bongo/releases/latest
 
 To build your project foo.
 
