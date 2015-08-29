@@ -3,19 +3,19 @@
 An elegant static site generator.
 
 # Features
-* fast (yes speed as a feature)
-* flexible. You can assemble your own static generator.
-* simple to use.
-* themes support.
-* minimaliistic.
+* Fast. (yes, speed as a feature)
+* Flexible. You can assemble your own static generator.
+* Simple to use.
+* Themes support.
+* Minimalistic.
 
 # Status
 The project is in __alpha__ state.
 
 	
-### documentation
+### Documentation
 
-for Installation and usage see [documentation](http://godoc.org/github.com/gernest/bongo)
+For Installation and Usage see [documentation](http://godoc.org/github.com/gernest/bongo)
 
 
 # Contributing
