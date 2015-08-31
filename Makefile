@@ -1,7 +1,7 @@
 cmd_dir:=cmd/bongo
 .PHONY: all dist
 ifeq "$(origin APP_VER)" "undefined"
-VERSION=0.1
+APP_VER=0.1
 endif
 all: test
 	@go vet
@@ -16,7 +16,7 @@ deps:
 
 dist:
 	-@rm -r dist
-	@gox -output="dist/{{.Dir}}.v$(VERSION)_{{.OS}}_{{.Arch}}/{{.Dir}}" ./cmd/bongo
+	@gox -output="dist/{{.Dir}}v$(APP_VER)_{{.OS}}_{{.Arch}}/{{.Dir}}" ./cmd/bongo
 
 test:
 	@go test 
