@@ -1,39 +1,32 @@
 package bongo
 
-import (
-	"os"
-
-	"github.com/bongo-contrib/loaders"
-	"github.com/bongo-contrib/matters"
-	"github.com/bongo-contrib/models"
-	"github.com/bongo-contrib/renderers"
-)
+import "os"
 
 type defaultApp struct {
-	loaders.DefaultLoader
-	*matters.Matter
-	*renderers.DefaultRenderer
+	DefaultLoader
+	*Matter
+	*DefaultRenderer
 }
 
 func newDefaultApp() *defaultApp {
 	app := &defaultApp{}
-	app.Matter = matters.NewYAML()
-	app.DefaultRenderer = renderers.New()
+	app.Matter = NewYAML()
+	app.DefaultRenderer = NewDefaultRenderer()
 	return app
 }
 
 //App is the main bongo application
 type App struct {
-	gene models.Generator
+	gene Generator
 }
 
-//New creates a new App which uses default models.Generator implementation
+//New creates a new App which uses default Generator implementation
 func New() *App {
 	return NewApp(newDefaultApp())
 }
 
 //NewApp creates a new app, that uses g as the generator
-func NewApp(g models.Generator) *App {
+func NewApp(g Generator) *App {
 	return &App{gene: g}
 }
 
@@ -43,8 +36,8 @@ func (g *App) Run(root string) error {
 	if err != nil {
 		return err
 	}
-	pages := make(models.PageList, len(files))
-	send := make(chan *models.Page)
+	pages := make(PageList, len(files))
+	send := make(chan *Page)
 	errs := make(chan error)
 	for _, f := range files {
 		go func(file string) {
@@ -64,7 +57,7 @@ func (g *App) Run(root string) error {
 				errs <- err
 				return
 			}
-			send <- &models.Page{Path: file, Body: body, Data: front, ModTime: stat.ModTime()}
+			send <- &Page{Path: file, Body: body, Data: front, ModTime: stat.ModTime()}
 		}(f)
 	}
 	n := 0
@@ -97,7 +90,7 @@ END:
 	}
 	err = g.gene.Render(root, pages)
 	if err != nil {
-		renderers.Rollback(root) // roll back before exiting
+		Rollback(root) // roll back before exiting
 		return err
 	}
 
