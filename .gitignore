@@ -2,3 +2,4 @@ bower_components
 .idea
 testdata/sample/_site
 dist
+cmd/bongo/bongo
