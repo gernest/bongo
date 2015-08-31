@@ -142,31 +142,14 @@ Important frontmatter settings,
 
 The Library
 
-Bongo is modular, and uses interfaces to define its components. Interfaces for static
-website generation are found in the https://github.com/bongo-contrib/models
-Infact, bongo just utilize the Interfaces defined in the https://github.com/bongo-contrib/models
-package.The most important interface is the Generator interface.
+Bongo is modular, and uses interfaces to define its components.The most important interface is
+the Generator interface.
 
 So, you can implement your own Generator interface, and pass it to the bongo library to have your
 own static website generator with your own rules.
 
 I challenge you, to try implementing different Generators. Or, implement different components of the
-generator interface. I have default implementations in separate packages to pave way for user submissions.
-
-the following are the packages containing the implementations.
-
-	github.com/bongo-contrib/loaders
-		- FileLoader implementations
-
-	github.com/bongo-contrib/matters
-		- FrontMatter implementations
-
-	github.com/bongo-contrib/models
-		- Definitions of all interfaces
-
-	github.com/bongo-contrib/renderers
-		- Renderer implementations.
-
+generator interface. I have default implementations shipped with bongo.
 
 */
 package bongo
