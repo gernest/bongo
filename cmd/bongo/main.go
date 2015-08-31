@@ -6,9 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bongo-contrib/loaders"
-	"github.com/bongo-contrib/models"
-
 	"github.com/gernest/bongo"
 
 	"gopkg.in/fsnotify.v1"
@@ -60,7 +57,7 @@ func serve(ctx *cli.Context) {
 	if err != nil {
 		log.Println(err)
 	}
-	files, err := loaders.New().Load(src)
+	files, err := bongo.NewLoader().Load(src)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,7 +70,7 @@ func serve(ctx *cli.Context) {
 		watch.Add(file)
 	}
 	go func() {
-		dir := filepath.Join(src, models.OutputDir)
+		dir := filepath.Join(src, bongo.OutputDir)
 		log.Println("serving website", dir, "  at  http://localhost:8000")
 		log.Fatal(http.ListenAndServe(":8000", http.FileServer(http.Dir(dir))))
 	}()
