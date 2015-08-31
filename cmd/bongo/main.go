@@ -19,7 +19,7 @@ var (
 	}
 	sourceFlagName = "source"
 	appName        = "bongo"
-	version        = "0.1.0"
+	version        = "0.1.1"
 )
 
 func buildFlags() []cli.Flag {
