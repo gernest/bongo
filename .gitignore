@@ -3,3 +3,5 @@ bower_components
 testdata/sample/_site
 dist
 cmd/bongo/bongo
+docs/_site
+docs/gh-pages
