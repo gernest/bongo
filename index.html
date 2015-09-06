@@ -1,74 +1,140 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
+<html>
+<head lang="en">
     <meta charset="UTF-8">
-    <title>Bongo by gernest</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Bongo</h1>
-      <h2 class="project-tagline">Elegant static website generation with Go</h2>
-      <a href="https://github.com/gernest/bongo" class="btn">View on GitHub</a>
-      <a href="https://github.com/gernest/bongo/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/gernest/bongo/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+    <title></title>
+    <link rel="stylesheet" href="/static/css/primer.css">
+    <link rel="stylesheet" href="/static/css/user-content.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="columns">
+        
+        
+        <div class="markdown-body">
+		<h1>
+		 Elegant static website generation with Go
+		</h1>
+            <p>bongo is an elegant static website generator. It is designed to be simple minimal
+and easy to use.</p>
+<p>Bongo comes in two flavors. The commandline applicaion and the library.</p>
+<p>Commandline</p>
+<p>The commandline application can be found in cmd/bongo directory</p>
+<p>and you can install it via go get like this</p>
+<pre><code>go get github.com/gernest/bongo/cmd/bongo
 
-    <section class="main-content">
-      <h1>
-<a id="bongo---" class="anchor" href="#bongo---" aria-hidden="true"><span class="octicon octicon-link"></span></a>bongo <a href="https://travis-ci.org/gernest/bongo"><img src="https://travis-ci.org/gernest/bongo.svg" alt="Build Status"></a> <a href="https://coveralls.io/github/gernest/bongo?branch=master"><img src="https://coveralls.io/repos/gernest/bongo/badge.svg?branch=master&amp;service=github" alt="Coverage Status"></a> <a href="https://godoc.org/github.com/gernest/bongo"><img src="https://godoc.org/github.com/gernest/bongo?status.svg" alt="GoDoc"></a>
-</h1>
-
-<p>An elegant static site generator.</p>
-
-<h1>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h1>
-
+</code></pre>
+<p>Or just download the latest binary here <a href="https://github.com/gernest/bongo/releases/latest">https://github.com/gernest/bongo/releases/latest</a></p>
+<p>To build your project foo.</p>
 <ul>
-<li>Fast. (yes, speed as a feature)</li>
-<li>Flexible. You can assemble your own static generator.</li>
-<li>Simple to use.</li>
-<li>Themes support.</li>
-<li>Minimalistic.</li>
+<li><p>You can specify the path to foo</p><p> bongo build --source path/to/foo</p></li>
+<li><p>You can run at  the root of foo</p><p>  cd path/to/foo</p><p>  bongo build</p></li>
 </ul>
+<p>To serve your project locally. This will run a local server at port <a href="http://localhost:8000">http://localhost:8000</a>.
+The project will be rebuilt if any markdown file changes.</p>
+<ul>
+<li><p>You can specify the path to foo</p><p> bongo serve --source path/to/foo</p></li>
+<li><p>You can run at  the root of foo</p><p>  cd path/to/foo</p><p>  bongo serve</p></li>
+</ul>
+<p>The generated website will be in the directory _site at the root of your foo project.</p>
+<p>The Website Project Structure</p>
+<p>There is no restriction on how you arrange your project. If you have a project foo.
+It will be somewhare in a directory named foo. You can see the example in testdata/sample directory.</p>
+<p>Bongo only process markdown files found in your project root.Supported file extensions
+for the markdown files are</p>
+<pre><code>.md , .MD , .mdown, and .markdown
 
-<h1>
-<a id="status" class="anchor" href="#status" aria-hidden="true"><span class="octicon octicon-link"></span></a>Status</h1>
+</code></pre>
+<p>This means you can put your markdown files in any nested directories inside your project
+and bongo will process them without any problem. Bongo support github flavored markdown</p>
+<p>Optionaly, you can add sitewide configuration file <code>_bongo.yml</code> at the root of your project.
+The configuration is in yaml format. And there are a few settings you can change.</p>
+<pre><code>static
+  This is a list of static directories(relative from the project root). If defined
+  the directories will be copied to the output directory as is.
 
-<p>The project is in <strong>alpha</strong> state.</p>
+title
+  The string representing the title of the project.
 
-<h3>
-<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h3>
+subtitle
+  The string representing subtitle of the project
 
-<p>For Installation and Usage see <a href="http://godoc.org/github.com/gernest/bongo">documentation</a></p>
+theme
+  The name of the theme to use. Note that, bongo comes with a default theme called gh.
+  Only if you have a theme installed in the _themes directory at the root of your project
+  will you neeed to specify this.
 
-<h1>
-<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h1>
 
-<p>Just fork, and submit a pull request.</p>
+</code></pre>
+<p>Themes</p>
+<p>There is  loose restrictions in the how to create your own theme. What matters is that you have
+the following templates.</p>
+<pre><code>index.html
+    - used to render index pages for sections
 
-<h2>
-<a id="author" class="anchor" href="#author" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author</h2>
+home.html
+    - used to render home page
 
-<p>Geofrey Ernest <a href="mailto:geofreyernest@live.com">geofreyernest@live.com</a></p>
+page.html
+    - used to render arbitrary pages
 
-<h2>
-<a id="licence" class="anchor" href="#licence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licence</h2>
+post.html
+    - used to render the posts
 
-<p>This project is released under MIT licence see <a href="LICENCE">LICENCE</a> for more details.</p>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/gernest/bongo">Bongo</a> is maintained by <a href="https://github.com/gernest">gernest</a>.</span>
+</code></pre>
+<p>These templates can be used in project, by setting the view value of frontmatter. For instance
+if I set view to post, then post.html will be used on that particular file.</p>
+<p>IMPORTANT: All static contents should be placed in a diretory named static at the root of the
+theme. They will be copied to the output directory unchanged.</p>
+<p>All themes custom themes should live under the <em>theme directory at the project root. Please
+see testdata/sample/</em>themes for an example.</p>
+<p>Frontmatter</p>
+<p>Bongo support frontmatter. And it is recomended every post(your markdown file) should have
+a frontmatter. For convenience, only YAML frontmatter is supported by default. And you can
+add it at the beginning of your file like this.</p>
+<pre><code>---
+title: chapter one
+section: blog
+---
 
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
+Your post contents goes here.
 
-    </section>
+</code></pre>
+<p>Important frontmatter settings,</p>
+<pre><code>title
+    -The title of the post
 
-  
-  </body>
+section
+    - this acts as a category of sort. You can specify any section that the
+    post will reside.
+
+    Sections are in the form of relative directory paths. for instance the following
+    are valid sections blog, blog/funny, blog/happy, blog/stuffs.
+
+    If you specify section as blog/golang. bongo will put the generated html files in the
+    folder named blog/golang. And you can referance your post by blog/golang/mypost.html.
+    where mypost is the name of your markdown file.
+
+    The default section is home.
+
+view
+    - specifies the template to render the content.Defaults to post.
+
+
+
+</code></pre>
+<p>The Library</p>
+<p>Bongo is modular, and uses interfaces to define its components.The most important interface is
+the Generator interface.</p>
+<p>So, you can implement your own Generator interface, and pass it to the bongo library to have your
+own static website generator with your own rules.</p>
+<p>I challenge you, to try implementing different Generators. Or, implement different components of the
+generator interface. I have default implementations shipped with bongo.</p>
+        </div>
+        
+        
+    </div>
+</div>
+</body>
 </html>
