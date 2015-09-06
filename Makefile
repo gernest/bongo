@@ -23,3 +23,9 @@ test:
 
 install:
 	@cd $(cmd_dir)&&go install
+
+gh-pages:
+	@go run cmd/docs/docs.go
+
+preview-docs:
+	@./${cmd_dir}/bongo serve --source docs

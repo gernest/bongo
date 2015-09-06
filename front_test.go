@@ -56,6 +56,9 @@ func TestYAMLMatter(t *testing.T) {
 	if _, ok := f["title"]; !ok {
 		t.Error("expeced title")
 	}
+
+	//	body, _ := ioutil.ReadAll(b)
+	//	t.Error(string(body))
 }
 
 func TestLargeFile(t *testing.T) {
@@ -77,4 +80,6 @@ func TestLargeFile(t *testing.T) {
 	if _, ok := f["title"]; !ok {
 		t.Error("expeced title")
 	}
+	//	body, _ := ioutil.ReadAll(b)
+	//	t.Error(string(body))
 }

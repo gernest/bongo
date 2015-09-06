@@ -29,8 +29,10 @@ type (
 
 //Matter is all what matters here.
 type Matter struct {
-	handlers map[string]HandlerFunc
-	delim    string
+	handlers  map[string]HandlerFunc
+	delim     string
+	lastDelim bool
+	lastIndex int
 }
 
 func newMatter() *Matter {
@@ -72,7 +74,7 @@ func (m *Matter) Parse(input io.Reader) (front map[string]interface{}, body io.R
 }
 func (m *Matter) parse(input io.Reader) (front map[string]interface{}, body io.Reader, err error) {
 	var getFront = func(f string) string {
-		return strings.TrimSpace(f[3:])
+		return strings.TrimSpace(strings.TrimPrefix(strings.TrimSuffix(f, m.delim), m.delim))
 	}
 	f, body, err := m.splitFront(input)
 	if err != nil {
@@ -106,8 +108,8 @@ func (m *Matter) splitFront(input io.Reader) (front string, body io.Reader, err 
 	for s.Scan() {
 		if n == 0 {
 			f = s.Text()
-		} else if n == 1 {
-			b = s.Text()
+		} else {
+			b = b + s.Text()
 		}
 		n++
 
@@ -133,9 +135,12 @@ func (m *Matter) split(data []byte, atEOF bool) (advance int, token []byte, err 
 	if x := bytes.Index(data, []byte(m.delim)); x >= 0 {
 		// check the next delim index
 		if next := bytes.Index(data[x+len(m.delim):], []byte(m.delim)); next > 0 {
-			return next + len(m.delim), dropSpace(data[:next+len(m.delim)]), nil
+			if !m.lastDelim {
+				m.lastDelim = true
+				m.lastIndex = next + len(m.delim)
+				return next + len(m.delim)*2, dropSpace(data[x : next+len(m.delim)]), nil
+			}
 		}
-		return len(data), dropSpace(data[x+len(m.delim):]), nil
 	}
 	if atEOF {
 		return len(data), data, nil
