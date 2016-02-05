@@ -18,7 +18,7 @@ go get github.com/gernest/cmd/bongo
 
 The library
 ```bash
-go get github.com/gernest/cmd/bongo
+go get github.com/gernest/bongo
 ```
 
 	
