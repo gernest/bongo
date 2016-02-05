@@ -4,10 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/bongo-contrib/models"
-
-	"github.com/bongo-contrib/utils"
 )
 
 var supportedExtensions = []string{".md", ".MD", "..markdown"}
@@ -30,9 +26,9 @@ func (d DefaultLoader) Load(base string) ([]string, error) {
 				return err
 			case info.IsDir():
 				return nil
-			case !utils.HasExt(path, supportedExtensions...):
+			case !HasExt(path, supportedExtensions...):
 				return nil
-			case strings.Contains(path, models.OutputDir):
+			case strings.Contains(path, OutputDir):
 				return nil
 			}
 			rst = append(rst, path)
