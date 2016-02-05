@@ -9,8 +9,17 @@ An elegant static site generator.
 * Themes support.
 * Minimalistic.
 
-# Status
-The project is in __alpha__ state.
+# Installation
+
+The commadline app
+```bash
+go get github.com/gernest/cmd/bongo
+```
+
+The library
+```bash
+go get github.com/gernest/cmd/bongo
+```
 
 	
 ### Documentation
