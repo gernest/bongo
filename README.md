@@ -30,9 +30,5 @@ For Installation and Usage see [documentation](http://godoc.org/github.com/gerne
 # Contributing
 Just fork, and submit a pull request.
 
-
-## Author
-Geofrey Ernest <geofreyernest@live.com>
-
 ## Licence
 This project is released under MIT licence see [LICENCE](LICENCE) for more details.
