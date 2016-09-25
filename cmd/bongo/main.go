@@ -10,7 +10,7 @@ import (
 
 	"gopkg.in/fsnotify.v1"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 var (
@@ -116,5 +116,5 @@ func main() {
 			Flags:       buildFlags(),
 		},
 	}
-	app.RunAndExitOnError()
+	app.Run(os.Args)
 }
