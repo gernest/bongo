@@ -80,6 +80,7 @@ type (
 		Body    io.Reader
 		ModTime time.Time
 		Data    interface{}
+		Tags    []string
 	}
 
 	//FileLoader loads files needed for processing.
