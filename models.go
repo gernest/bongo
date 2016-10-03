@@ -76,11 +76,13 @@ type (
 
 	// Page is a represantation of text document
 	Page struct {
+		Title   string
 		Path    string
 		Body    io.Reader
 		ModTime time.Time
 		Data    interface{}
 		Tags    []string
+		View    string
 	}
 
 	//FileLoader loads files needed for processing.

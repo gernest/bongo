@@ -1,6 +1,7 @@
 package bongo
 
 import (
+	"bytes"
 	"encoding/json"
 	"html/template"
 	"io/ioutil"
@@ -8,6 +9,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/extemporalgenome/slug"
 )
 
 //Context contains the tree of processed pages.
@@ -129,4 +132,43 @@ func (t *Template) Lookup(name string) *template.Template {
 		return theme
 	}
 	return t.Main.Lookup(name)
+}
+
+func (r *ContextRender) Render(root string, pages PageList, opts ...interface{}) error {
+	ctx := GetContext(pages)
+	for _, t := range ctx.Tags {
+		err := r.RenderTag(ctx, t)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *ContextRender) RenderTag(ctx *Context, t *Tag) error {
+	data := make(map[string]interface{})
+	data["Ctx"] = ctx
+	data["Tag"] = t
+	o := &bytes.Buffer{}
+	dir := filepath.Join(r.root, r.cfg.OutputDir, t.Name)
+	err := os.MkdirAll(dir, 0600)
+	if err != nil {
+		return err
+	}
+	for _, p := range t.Pages {
+		v := r.tpl.Lookup(p.View)
+		data["Page"] = p
+		o.Reset()
+		err := v.Execute(o, data)
+		if err != nil {
+			return err
+		}
+		name := slug.Slug(p.Title)
+		err = ioutil.WriteFile(filepath.Join(dir, name+".html"),
+			o.Bytes(), 0600)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
