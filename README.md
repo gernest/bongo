@@ -11,9 +11,10 @@ An elegant static site generator.
 
 # Installation
 
-The commadline app
+The command line app
+
 ```bash
-go get github.com/gernest/cmd/bongo
+go get github.com/gernest/bongo/cmd/bongo
 ```
 
 The library
